@@ -4,17 +4,9 @@ using System.Net;
 using System.Net.Mail;
 using System.Diagnostics;
 
-public static class SendBootedEmail{
+public static class SendExternIP{
 	public static void Main(string[] args){
-		if(GetIPData() == System.IO.File.ReadAllText(@"/home/lcfr822/Documents/externalIP.txt")){
-			Console.WriteLine("External IP Still Valid");
-			return;
-		}
-		else{
-			System.IO.File.WriteAllText(@"/home/lcfr822/Documents/externalIP.txt", GetIPData());
-		}
-		
-		MailMessage mail = new MailMessage("weather_bot@gmail.com", "lcfr822@gmail.com");
+		MailMessage mail = new MailMessage("boot_bot@gmail.com", "lcfr822@gmail.com");
 		SmtpClient client = new SmtpClient();
 
 		client.Port = 587;
@@ -23,16 +15,25 @@ public static class SendBootedEmail{
 		client.EnableSsl = true;
 		client.UseDefaultCredentials = false;
 		client.Credentials = new System.Net.NetworkCredential("lcfr822@gmail.com", "pgkamfbzjennabec");
-		mail.Subject = "IP-BOT UPDATE";
-		mail.Body = GetIPData();
+		mail.Subject = "BOOT-BOT NOTIFICATION";
+		
+		string[] body = GetBootData().Split('\n');
+		string compBody = "\"BEDPUTER\" SERVER BOOTED SUCCESSFULLY\n\nAVAILABLE UPDATES\n";
+		compBody += body[0];
+		compBody += body[1];
+		compBody += "\n\nCURRENT EXTERNAL IP ADDRESS\n";
+		compBody += body[2];
+		mail.Body = compBody;
+
 		mail.BodyEncoding = UTF8Encoding.UTF8;
 		mail.DeliveryNotificationOptions = DeliveryNotificationOptions.OnFailure;
 		client.Send(mail);
 
+		Environment.Exit(0);
 	}
 
-	private static string GetIPData(){
-		string command = "dig +short myip.opendns.com @resolver1.opendns.com";
+	private static string GetBootData(){
+		string command = "/usr/lib/update-notifier/apt-check --human-readable && dig +short myip.opendns.com @resolver1.opendns.com";
 		command.Replace("\"","\\\"");
 		var process = new Process()
 		{

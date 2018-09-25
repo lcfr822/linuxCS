@@ -4,16 +4,8 @@ using System.Net;
 using System.Net.Mail;
 using System.Diagnostics;
 
-public static class SendBootedEmail{
+public static class SendWeather{
 	public static void Main(string[] args){
-		if(GetIPData() == System.IO.File.ReadAllText(@"/home/lcfr822/Documents/externalIP.txt")){
-			Console.WriteLine("External IP Still Valid");
-			return;
-		}
-		else{
-			System.IO.File.WriteAllText(@"/home/lcfr822/Documents/externalIP.txt", GetIPData());
-		}
-		
 		MailMessage mail = new MailMessage("weather_bot@gmail.com", "lcfr822@gmail.com");
 		SmtpClient client = new SmtpClient();
 
@@ -23,16 +15,16 @@ public static class SendBootedEmail{
 		client.EnableSsl = true;
 		client.UseDefaultCredentials = false;
 		client.Credentials = new System.Net.NetworkCredential("lcfr822@gmail.com", "pgkamfbzjennabec");
-		mail.Subject = "IP-BOT UPDATE";
-		mail.Body = GetIPData();
+		mail.Subject = "WEATHER-BOT UPDATE";
+		mail.Body = GetWeatherData();
 		mail.BodyEncoding = UTF8Encoding.UTF8;
 		mail.DeliveryNotificationOptions = DeliveryNotificationOptions.OnFailure;
 		client.Send(mail);
 
 	}
 
-	private static string GetIPData(){
-		string command = "dig +short myip.opendns.com @resolver1.opendns.com";
+	private static string GetWeatherData(){
+		string command = "weather-util 98502";
 		command.Replace("\"","\\\"");
 		var process = new Process()
 		{
